@@ -61,8 +61,8 @@ if __name__ == "__main__":
         model_name, torch_dtype="auto", device_map="auto"
     )
 
-    loop_over_dataset(model, tokenizer, n_examples=10)
+    # loop_over_dataset(model, tokenizer, n_examples=10)
 
-    # prompt = "What is the capital of France?"
-    # ans = answer(model, tokenizer, prompt)
-    # dump_answer(ans, file="hf_answers.jsonl")
+    prompt = "What is the capital of France?"
+    ans = answer(model, tokenizer, prompt)
+    dump_answer(ans, file="answers/paris.jsonl")
