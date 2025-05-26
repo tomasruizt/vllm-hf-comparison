@@ -1,3 +1,5 @@
+enroot create --name my_custom_pt /dss/dssfs02/lwp-dss-0001/pn76je/pn76je-dss-0000/tomasruiz/my_custom_pt.sqsh
+
 enroot start --rw --root \
     --mount /dss/dsshome1/0D/di38bec/code:/workspace/code \
     --mount $DSS_HOME:$DSS_HOME \

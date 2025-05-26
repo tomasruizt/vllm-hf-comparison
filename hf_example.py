@@ -1,7 +1,15 @@
+"""
+Inspired by: https://huggingface.co/Qwen/Qwen3-14B
+"""
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import pandas as pd
 from tqdm import tqdm
-import time
+
+from utils import dump_answer
+
+
+MAX_NEW_TOKENS = 5000
 
 
 def answer(model, tokenizer, prompt):
@@ -15,7 +23,8 @@ def answer(model, tokenizer, prompt):
     model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
     # conduct text completion
-    generated_ids = model.generate(**model_inputs, max_new_tokens=5000)
+
+    generated_ids = model.generate(**model_inputs, max_new_tokens=MAX_NEW_TOKENS)
     output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
 
     # parsing thinking content
@@ -29,33 +38,28 @@ def answer(model, tokenizer, prompt):
         output_ids[:index], skip_special_tokens=True
     ).strip("\n")
     content = tokenizer.decode(output_ids[index:], skip_special_tokens=True).strip("\n")
-    return thinking_content, content
+    return prompt, content, thinking_content
 
 
-def loop_over_dataset(model, tokenizer):
-    dataset = pd.read_json("CSC_train.json", orient="index").head(100)
-    start = time.time()
+def loop_over_dataset(model, tokenizer, n_examples: int):
+    dataset = pd.read_json("CSC_train.json", orient="index")
+    dataset = dataset.head(n_examples)
     for text in tqdm(dataset["text"]):
         prompt = "Rate the sarcasm level in the response from 1 to 6: " + str(text)
-        _ = answer(model, tokenizer, prompt)
-    end = time.time()
-    print(f"Time taken: {end - start} seconds")
+        ans = answer(model, tokenizer, prompt)
+        dump_answer(ans, file="hf_answers.jsonl")
 
 
 if __name__ == "__main__":
-    model_name = "Qwen/Qwen3-0.6B"
+    model_name = "Qwen/Qwen3-14B"
 
-    # load the tokenizer and the model
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModelForCausalLM.from_pretrained(
         model_name, torch_dtype="auto", device_map="auto"
     )
 
-    loop_over_dataset(model, tokenizer)
+    loop_over_dataset(model, tokenizer, n_examples=10)
 
-    # # prepare the model input
     # prompt = "What is the capital of France?"
-    # thinking_content, content = answer(model, tokenizer, prompt)
-
-    # print("thinking content:", thinking_content)
-    # print("content:", content)
+    # ans = answer(model, tokenizer, prompt)
+    # dump_answer(ans, file="hf_answers.jsonl")
