@@ -8,12 +8,12 @@ enroot start --rw --root \
 
 export PYTHONUNBUFFERED=1
 
-vllm serve Qwen/Qwen3-0.6B \
+vllm serve Qwen/Qwen3-14B \
     --dtype auto \
     --enable-reasoning \
     --reasoning-parser deepseek_r1 \
     --task generate \
     --disable-log-requests \
     --max-model-len 8192 \
-    --gpu-memory-utilization 0.5 \
+    --gpu-memory-utilization 0.95 \
     --port 8001

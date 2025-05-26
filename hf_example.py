@@ -10,6 +10,7 @@ from utils import dump_answer
 
 
 MAX_NEW_TOKENS = 5000
+TEMPERATURE = 0.7
 
 
 def answer(model, tokenizer, prompt):
@@ -24,7 +25,9 @@ def answer(model, tokenizer, prompt):
 
     # conduct text completion
 
-    generated_ids = model.generate(**model_inputs, max_new_tokens=MAX_NEW_TOKENS)
+    generated_ids = model.generate(
+        **model_inputs, max_new_tokens=MAX_NEW_TOKENS, temperature=TEMPERATURE
+    )
     output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :].tolist()
 
     # parsing thinking content
@@ -47,7 +50,7 @@ def loop_over_dataset(model, tokenizer, n_examples: int):
     for text in tqdm(dataset["text"]):
         prompt = "Rate the sarcasm level in the response from 1 to 6: " + str(text)
         ans = answer(model, tokenizer, prompt)
-        dump_answer(ans, file="hf_answers.jsonl")
+        dump_answer(ans, file="answers/hf.jsonl")
 
 
 if __name__ == "__main__":
