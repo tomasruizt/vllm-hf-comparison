@@ -2,6 +2,8 @@ salloc --partition lrz-hgx-h100-94x4 --time 01:00:00 --gres=gpu:1
 
 srun --pty bash
 
+enroot remove my_custom_pt
+
 enroot create --name my_custom_pt /dss/dssfs02/lwp-dss-0001/pn76je/pn76je-dss-0000/tomasruiz/my_custom_pt.sqsh
 
 enroot start --rw --root \
@@ -9,6 +11,7 @@ enroot start --rw --root \
     --mount $DSS_HOME:$DSS_HOME \
     my_custom_pt
 
+. ~/ptvenv/bin/activate
 
 export PYTHONUNBUFFERED=1
 
